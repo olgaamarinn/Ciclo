@@ -1,0 +1,49 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2a2144"><link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>CycleIQ</title>
+<style>
+:root{--bg:#f2f0f7;--card:#fff;--ink:#1d1a2b;--mut:#6f6a85;--ac:#5b3ea6;--line:#e2deee;--per:#d6405f;--ovu:#2f9e63}
+@media(prefers-color-scheme:dark){:root{--bg:#13101f;--card:#1e1a30;--ink:#f1eefb;--mut:#a39dbd;--ac:#a88cf0;--line:#322c4a;--per:#f0627f;--ovu:#5fd08b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding-top:env(safe-area-inset-top)}
+main{max-width:560px;margin:0 auto;padding:12px 16px 100px}
+h1{font:700 28px/1.1 "Iowan Old Style",Georgia,serif;margin:10px 0 2px}
+.mut{color:var(--mut);font-size:13px;margin:4px 0}.big{font:700 34px/1.1 Georgia,serif;margin:6px 0}
+.card{background:var(--card);border-radius:16px;padding:14px;margin:12px 0}
+.card b:first-child{display:block;margin-bottom:8px}
+details.card summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;padding:2px 0}details.card summary::-webkit-details-marker{display:none}.fld{margin-top:14px}.fld>b{display:block;margin-bottom:6px;font-size:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:none;color:var(--ink);padding:9px 14px;border-radius:99px;font:inherit;font-size:14px;min-height:40px}
+.chip.on{background:var(--ac);border-color:var(--ac);color:var(--bg);font-weight:600}
+.chip:focus-visible,.d:focus-visible,nav button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+input[type=number],textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:10px 0}.cal small{text-align:center;color:var(--mut)}
+.d{aspect-ratio:1;border:0;border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:0}
+.d i{display:block;width:4px;height:4px;border-radius:50%;background:currentColor;margin:1px auto 0}
+.p-m,.p-f,.p-o,.p-l{background:color-mix(in srgb,var(--pc) 26%,var(--card))}.p-m{--pc:#e8607f}.p-f{--pc:#35b59e}.p-o{--pc:#f2b134}.p-l{--pc:#8e6bd8}
+.hero{display:flex;gap:14px;align-items:center;border-radius:18px;padding:16px;margin:12px 0;background:linear-gradient(135deg,color-mix(in srgb,var(--pc) 42%,var(--card)),color-mix(in srgb,var(--pc) 10%,var(--card)))}.emo{font-size:42px}.big2{font:700 24px/1.1 Georgia,serif}
+.lg{display:inline-block;padding:3px 10px;border-radius:99px;background:color-mix(in srgb,var(--pc) 28%,var(--card));font-size:12px;margin:2px 4px 2px 0}
+h1{background:linear-gradient(90deg,var(--ac),var(--per));-webkit-background-clip:text;background-clip:text;color:transparent}nav i{display:block;font-style:normal;font-size:19px}
+.per{background:var(--per);color:#fff}.pp{outline:1.5px dashed var(--per);outline-offset:-2px}
+.ov{box-shadow:inset 0 0 0 2.5px var(--ovu)}.ovp{box-shadow:inset 0 0 0 2px var(--ovu);opacity:.65}.today{font-weight:800;text-decoration:underline}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -1px 0 var(--line)}
+nav button{flex:1;padding:13px 0;background:none;border:0;color:var(--mut);font:inherit;font-size:13px}nav .on{color:var(--ac);font-weight:700}
+#toast{position:fixed;top:calc(env(safe-area-inset-top) + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:6px 14px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.s{opacity:1}
+.p-f{--pc:#5b8def}.p-o{--pc:#2f9e63}.p-l{--pc:#f2a45a}
+.d.p-m,.d.p-f,.d.p-o,.d.p-l{color:color-mix(in srgb,var(--pc) 65%,var(--ink));font-weight:600}
+.d{border-radius:10px}.per{background:color-mix(in srgb,var(--per) 50%,var(--card));color:var(--ink)}
+.ov{box-shadow:inset 0 0 0 2px var(--ovu)}.today{box-shadow:inset 0 0 0 2.5px var(--ink);text-decoration:none;font-weight:800}.d.fut{opacity:.55}
+.lg{background:none;padding:0;margin:2px 12px 2px 0}.lg i{display:inline-block;width:13px;height:13px;border-radius:4px;background:var(--pc);margin-right:6px;vertical-align:-2px}
+.banner{background:color-mix(in srgb,#f2a45a 24%,var(--card));border-radius:12px;padding:12px 14px;margin:12px 0}
+.sub{margin:2px 0 8px;color:var(--mut)}.sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line)}
+.dots{display:flex;flex:none}.dot{width:36px;height:42px;background:none;border:0;padding:0;display:grid;place-items:center}.dot::before{content:'';width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}.dot.f::before{background:var(--dc);border-color:var(--dc)}.dot:focus-visible{outline:2px solid var(--ac);border-radius:8px}
+nav .on{color:var(--per)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><main id="v"></main>
+<nav id="nav"><button data-tab="log"><i>📝</i>Registro</button><button data-tab="cal"><i>🗓️</i>Calendario</button><button data-tab="chart"><i>📈</i>Ciclos</button><button data-tab="ins"><i>✨</i>Patrones</button><button data-tab="set"><i>⚙️</i>Ajustes</button></nav>
+<div id="toast" role="status"></div><script src="app.js"></script></body></html>
