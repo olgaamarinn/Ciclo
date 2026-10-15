@@ -10,7 +10,7 @@ const db=new Promise((res,rej)=>{const r=indexedDB.open('cycleiq',1);r.onupgrade
 const tx=async(m,f)=>{const d=await db;return new Promise((res,rej)=>{const t=d.transaction('logs',m),o=f(t.objectStore('logs'));t.oncomplete=()=>res(o.result);t.onerror=()=>rej(t.error)})};
 const dbAll=()=>tx('readonly',s=>s.getAll()),put=l=>tx('readwrite',s=>s.put(l)),del=k=>tx('readwrite',s=>s.delete(k)),clr=()=>tx('readwrite',s=>s.clear());
 // ---- los ciclos se derivan de los registros: empieza uno en el primer día con flujo tras >=3 días sin él ----
-const fl=l=>{if(Object.keys(l).filter(k=>!['date','flow','note'].includes(k)).length<2)return l;const x={...l};F.filter(f=>f.z).forEach(f=>{if(x[f.k]==null)x[f.k]=f.m?[]:1});return x};
+const fl=l=>{if(Object.keys(l).filter(k=>!['date','flow','note'].includes(k)).length<2)return l;const x={...l};F.filter(f=>f.z).forEach(f=>{if(x[f.k]==null)x[f.k]=f.m?[]:0});return x};
 function cyc(){const L=Object.values(S.logs).sort((a,b)=>a.date<b.date?-1:1),st=[];
  L.forEach(l=>{if(l.flow>0&&[1,2,3].every(i=>!(S.logs[add(l.date,-i)]?.flow>0)))st.push(l.date)});
  return st.map((s,i)=>{const nx=st[i+1],d={};L.forEach(l=>{const n=diff(s,l.date)+1;if(n>=1&&(!nx||l.date<nx))d[n]=fl(l)});return{s,len:nx?diff(s,nx):null,d}})}
@@ -33,7 +33,7 @@ const F=[
 {k:'irritab',g:'mind',l:'Irritabilidad',s:1,z:1,w:'hi'},{k:'selfesteem',g:'mind',l:'Autoestima',s:1,w:'lo'},{k:'fulfil',g:'mind',l:'Realización personal',s:1,w:'lo'},
 {k:'focus',g:'mind',l:'Concentración',s:1,w:'lo'},{k:'stress',g:'mind',l:'Estrés',s:1,w:'hi'},
 {k:'social',g:'soc',l:'Sociabilidad',s:1,w:'lo'},{k:'comm',g:'soc',l:'Comunicación',s:1,w:'lo'},{k:'libido',g:'soc',l:'Libido',s:1,w:'hi'},
-{k:'sex',g:'soc',l:'Actividad sexual',o:['Ninguna','Sin protección','Con protección']}];
+{k:'sex',g:'soc',l:'Actividad sexual',o:['Ninguna','Masturbación','Sexo']}];
 const PH={m:{n:'Menstrual',e:'🌹',c:'#e8607f',g:'El estrógeno y la progesterona están bajos. Es habitual notar menos energía y más molestias. El ejercicio suave (caminar, yoga, estiramientos) suele sentar bien, y el descanso ayuda.'},
 f:{n:'Folicular',e:'🌱',c:'#5b8def',g:'El estrógeno va subiendo. A muchas personas les sube la energía, el ánimo y la concentración. Suele ser buen momento para entrenar más fuerte, aprender cosas nuevas y hacer planes sociales.'},
 o:{n:'Ovulatoria',e:'🌸',c:'#2f9e63',g:'Pico de estrógeno y de la hormona LH. La libido y las ganas de socializar suelen estar más altas, y la energía también. Es la fase de mayor fertilidad.'},
@@ -54,7 +54,7 @@ function insights(M){const o=[],C=M.done,P=(t,b,sc,win)=>o.push({t,b,sc,win});
    P(`${lb} en los <b>días ${i+1}–${j+1}</b> del ciclo.`,`Se repite en ${h.length} de ${w.length} ciclos.`,3+h.length/w.length,{lb,i:i+1,j:j+1})}i=j}})}
  F.filter(f=>f.s).forEach(f=>{const k=f.k,rows=C.filter(c=>c.ov).map(c=>{const g=(a,b)=>{const v=Object.entries(c.d).filter(e=>+e[0]>=a&&+e[0]<=b&&e[1][k]!=null).map(e=>e[1][k]);return v.length>=3?mean(v):null};return[g(6,c.ov),g(c.ov+1,c.len)]}).filter(r=>r[0]!=null&&r[1]!=null);
   if(rows.length>=3){const up=rows.filter(r=>r[1]>r[0]).length,dn=rows.filter(r=>r[1]<r[0]).length,d=mean(rows.map(r=>r[1]-r[0]));
-   if(Math.abs(d)>=.4&&Math.max(up,dn)>=.75*rows.length)P(`${f.l}: <b>más ${d>0?'alto':'bajo'} después de la ovulación</b> (${d>0?'+':''}${d.toFixed(1)} en la escala 1–5).`,`Coincide en ${Math.max(up,dn)} de ${rows.length} ciclos.`,Math.abs(d)*3)}});
+   if(Math.abs(d)>=.4&&Math.max(up,dn)>=.75*rows.length)P(`${f.l}: <b>más ${d>0?'alto':'bajo'} después de la ovulación</b> (${d>0?'+':''}${d.toFixed(1)} en la escala 0–5).`,`Coincide en ${Math.max(up,dn)} de ${rows.length} ciclos.`,Math.abs(d)*3)}});
  const rows=M.C.flatMap(c=>Object.entries(c.d).map(([n,l])=>({...l,lut:!!c.ov&&+n>c.ov})));
  const cor=sub=>[['sleep','mood'],['sleep','energy'],['sleepq','mood'],['sleepq','energy'],['sleep','irritab'],['sleep','focus'],['pain','mood'],['move','pain'],['move','mood'],['move','energy'],['stress','sleep'],['stress','irritab'],['irritab','social'],['energy','mood'],['selfesteem','mood'],['social','mood'],['libido','mood'],['breast','pain']].map(([a,b])=>{const r=sub.filter(x=>x[a]!=null&&x[b]!=null);return r.length<15?null:{a,b,n:r.length,rho:spear(r.map(x=>x[a]),r.map(x=>x[b]))}}).filter(x=>x&&Math.abs(x.rho)>=.35);
  const txt=(x,pre)=>P(`${pre}<b>${lab(x.a)} y ${lab(x.b).toLowerCase()}</b> ${x.rho>0?'suben y bajan juntos':'van en sentido contrario'}.`,`Spearman ρ = ${x.rho.toFixed(2)} en ${x.n} días. Es una asociación, no prueba que una cause la otra.`,Math.abs(x.rho)*8);
@@ -66,7 +66,7 @@ const CS=c=>`background:${c};border-color:${c};color:#1d1a2b`;
 const ctl=(f,l)=>{const v=l[f.k];
  if(f.n)return`<input type=number inputmode=decimal data-n=${f.k} min=${f.n[0]} max=${f.n[1]} step=${f.n[2]} value="${v??''}" placeholder="—">`;
  if(f.m)return`<div class=chips>${f.o.map(t=>{const x=t.toLowerCase();return`<button class="chip${(v||[]).includes(x)?' on':''}" style="${(v||[]).includes(x)?CS(GC[f.g]):''}" data-k=${f.k} data-t="${x}">${t}</button>`}).join('')}</div>`;
- return`<div class=chips>${(f.o||['1','2','3','4','5']).map((t,i)=>{const x=f.o?i:i+1;return`<button class="chip${v===x?' on':''}" style="${v===x?CS(GC[f.g]):''}" data-k=${f.k} data-v=${x}>${t}</button>`}).join('')}</div>`};
+ return`<div class=chips>${(f.o||['0','1','2','3','4','5']).map((t,i)=>{const x=i;return`<button class="chip${v===x?' on':''}" style="${v===x?CS(GC[f.g]):''}" data-k=${f.k} data-v=${x}>${t}</button>`}).join('')}</div>`};
 function vLog(){const l=S.logs[S.date]||{},M=model(),ph=phaseNow(M,S.date),nx=M.p?diff(S.date,M.p.list[0].next):0;
  const sub=ph?`<i class=sw style="background:${ph.k?PH[ph.k].c:'var(--mut)'}"></i>${ph.k?'Fase '+PH[ph.k].n.toLowerCase():'Fase por determinar'}${nx>0?` · Est. ${nx} días hasta la próxima regla`:''}`:'Anota un día de regla para empezar tu primer ciclo';
  return`<h1>${S.date==TODAY?'Hoy':fmt(S.date)}${ph?` · Día ${ph.n}`:''}</h1><p class=sub>${sub}${S.date!=TODAY?' · <a href="#" data-day='+TODAY+'>volver a hoy</a>':''}</p>`+
