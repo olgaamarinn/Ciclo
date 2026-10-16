@@ -14,7 +14,7 @@ const fl=l=>{if(Object.keys(l).filter(k=>!['date','flow','note'].includes(k)).le
 function cyc(){const L=Object.values(S.logs).sort((a,b)=>a.date<b.date?-1:1),st=[];
  L.forEach(l=>{if(l.flow>0&&[1,2,3].every(i=>!(S.logs[add(l.date,-i)]?.flow>0)))st.push(l.date)});
  return st.map((s,i)=>{const nx=st[i+1],d={};L.forEach(l=>{const n=diff(s,l.date)+1;if(n>=1&&(!nx||l.date<nx))d[n]=fl(l)});return{s,len:nx?diff(s,nx):null,d}})}
-function ovOf(c){const m=Object.entries(c.d).filter(e=>e[1].mucus>=4).map(e=>+e[0]);return m.length?Math.max(...m):null}
+function ovOf(c){const m=Object.entries(c.d).filter(e=>e[1].mucus==4).map(e=>+e[0]);return m.length?Math.max(...m):null}
 function model(){const C=cyc();C.forEach(c=>c.ov=ovOf(c));const done=C.filter(c=>c.len>=15&&c.len<=60),lens=done.map(c=>c.len),ovs=C.map(c=>c.ov).filter(Boolean),last=C[C.length-1];let p=null;
  if(last&&lens.length>=2){const n=lens.length,v=Math.max(sd(lens)**2,1),prec=1/16+n/v,mu=(28/16+n*mean(lens)/v)/prec;// actualización normal-normal; el prior débil de 28 días se diluye con tus datos
   const t2=1/prec,mo=ovs.length?Math.round(mean(ovs))-1:null;p={mu,s:Math.sqrt(t2+v),list:[1,2,3].map(k=>{const st=add(last.s,Math.round(mu*k));return{k,next:st,r:Math.round(1.28*Math.sqrt(k*v+k*k*t2)),ov:mo!=null?add(st,mo):null}}),ov:mo!=null?add(last.s,mo):null}}
@@ -24,7 +24,7 @@ function model(){const C=cyc();C.forEach(c=>c.ov=ovOf(c));const done=C.filter(c=
 const G={core:'Lo esencial',body:'Cuerpo',mind:'Mente y emociones',soc:'Social y sexualidad'};
 const F=[
 {k:'flow',g:'core',l:'Flujo menstrual',o:['Nada','Poco','Normal','Abundante'],req:1},
-{k:'mucus',g:'core',l:'Flujo vaginal (moco)',o:['Seco','Pegajoso','Cremoso','Acuoso','Clara de huevo'],req:1},
+{k:'mucus',g:'core',l:'Flujo vaginal (moco)',o:['Seco','Pegajoso','Cremoso','Acuoso','Clara de huevo','Nada'],req:1},
 {k:'energy',g:'core',l:'Nivel de energía',s:1,w:'lo'},{k:'mood',g:'core',l:'Estado de ánimo',s:1,w:'lo'},
 {k:'pain',g:'body',l:'Dolor',s:1,z:1,w:'hi'},{k:'painType',g:'body',l:'Tipo de dolor',m:1,z:1,pre:'Tipo de dolor: ',o:['Cólicos','Cabeza','Lumbar','Pélvico','Articular','Migraña']},
 {k:'breast',g:'body',l:'Sensibilidad en el pecho',s:1,z:1,w:'hi'},{k:'sleep',g:'body',l:'Dormir (horas)',n:[0,14,.5]},{k:'sleepq',g:'body',l:'Calidad del sueño',s:1,w:'lo'},
@@ -40,7 +40,7 @@ o:{n:'Ovulatoria',e:'🌸',c:'#2f9e63',g:'Pico de estrógeno y de la hormona LH.
 l:{n:'Lútea',e:'🌙',c:'#f2a45a',g:'Sube la progesterona. Hacia el final es frecuente notar más hambre, antojos, pecho sensible, irritabilidad y menos energía o concentración. El ejercicio moderado, dormir bien y bajar el ritmo social suelen ayudar.'}};
 const GC={core:'#e8607f',body:'#35b59e',mind:'#8e6bd8',soc:'#f2b134'},SC=['#5b8def','#35b59e','#f2b134','#f08a4b','#e8607f'];
 const lab=k=>F.find(f=>f.k==k).l.replace(/ \(.*/,'');
-let cfg=JSON.parse(localStorage.getItem('ciq')||'{"hide":[]}');const S={tab:'log',date:TODAY,logs:{},month:TODAY.slice(0,7),metric:'energy',sel:[],pt:null,open:{core:1}};
+let cfg=JSON.parse(localStorage.getItem('ciq')||'{"hide":[]}');const S={tab:'log',date:TODAY,logs:{},month:TODAY.slice(0,7),metric:'energy',sel:[],pt:null,rph:null,open:{core:1}};
 const on=k=>!cfg.hide.includes(k);
 // ---- motor de patrones ----
 function insights(M){const o=[],C=M.done,P=(t,b,sc,win)=>o.push({t,b,sc,win});
@@ -65,7 +65,7 @@ function insights(M){const o=[],C=M.done,P=(t,b,sc,win)=>o.push({t,b,sc,win});
 const CS=c=>`background:${c};border-color:${c};color:#1d1a2b`;
 const ctl=(f,l)=>{const v=l[f.k];
  if(f.n)return`<input type=number inputmode=decimal data-n=${f.k} min=${f.n[0]} max=${f.n[1]} step=${f.n[2]} value="${v??''}" placeholder="—">`;
- if(f.m)return`<div class=chips>${f.o.map(t=>{const x=t.toLowerCase();return`<button class="chip${(v||[]).includes(x)?' on':''}" style="${(v||[]).includes(x)?CS(GC[f.g]):''}" data-k=${f.k} data-t="${x}">${t}</button>`}).join('')}</div>`;
+ if(f.m)return`<div class=chips>${[...f.o,'Nada'].map(t=>{const x=t.toLowerCase();return`<button class="chip${(v||[]).includes(x)?' on':''}" style="${(v||[]).includes(x)?CS(GC[f.g]):''}" data-k=${f.k} data-t="${x}">${t}</button>`}).join('')}</div>`;
  return`<div class=chips>${(f.o||['0','1','2','3','4','5']).map((t,i)=>{const x=i;return`<button class="chip${v===x?' on':''}" style="${v===x?CS(GC[f.g]):''}" data-k=${f.k} data-v=${x}>${t}</button>`}).join('')}</div>`};
 function vLog(){const l=S.logs[S.date]||{},M=model(),ph=phaseNow(M,S.date),nx=M.p?diff(S.date,M.p.list[0].next):0;
  const sub=ph?`<i class=sw style="background:${ph.k?PH[ph.k].c:'var(--mut)'}"></i>${ph.k?'Fase '+PH[ph.k].n.toLowerCase():'Fase por determinar'}${nx>0?` · Est. ${nx} días hasta la próxima regla`:''}`:'Anota un día de regla para empezar tu primer ciclo';
@@ -85,6 +85,31 @@ function phaseCard(M,date,full){const ph=phaseNow(M,date);
  return`<div class=hero style="--pc:${P.c}"><div class=emo>${P.e}</div><div><div class=mut>Día ${ph.n} del ciclo</div><div class=big2>Fase ${P.n}</div>${M.gen?'<div class=mut>Estimada con la regla general de ~14 días de fase lútea. Mejora cuando registras tu moco.</div>':''}</div></div>`+
  `<div class=card style="border-left:5px solid ${P.c}"><b>En tus ciclos</b>${st.length?st.map(s=>`<p>${s.d>0?'▲':'▼'} <b>${s.x.l}</b>: ${s.a.toFixed(1)} de media en esta fase frente a ${s.b.toFixed(1)} el resto del ciclo <span class=mut>(${s.n} días)</span></p>`).join(''):'<p class=mut>Aún no hay suficientes datos tuyos para esta fase (hacen falta unos 5 días registrados en ella y 8 fuera).</p>'}</div>`+
  (full?`<details class=card data-g=gen style="border-left:5px solid ${P.c}" ${S.open.gen?'open':''}><summary><b>En general (no es tuyo)</b><span class=mut>tendencias</span></summary><p>${P.g}</p><p class=mut>Son tendencias generales; no se cumplen igual en todas las personas ni sustituyen a un consejo médico.</p></details>`:'<p class=mut><a href="#" data-tab=ins>Ver más sobre esta fase</a></p>')}
+const REC={
+m:[['🏃','Ejercicio','Suave o moderado según cómo te sientas: caminar, yoga, estiramientos o natación. Si tienes dolor, baja la intensidad; si tienes energía, puedes entrenar con normalidad.'],
+['🥗','Alimentación','Alimentos con hierro (legumbres, huevos, carne magra, espinacas, frutos secos) junto con vitamina C para absorberlo mejor. Bebe agua y toma comidas calientes si te sientan bien.'],
+['😴','Descanso','Puedes necesitar dormir algo más. El calor local (bolsa de agua caliente) suele aliviar los cólicos.'],
+['👥','Vida social','Planes tranquilos y sin presión. Está bien reservar energía.'],
+['🧠','Mente y trabajo','Buen momento para revisar, ordenar y planificar; deja para más adelante lo que más te exija.'],
+['⚠️','Consulta a un profesional si','el dolor es muy intenso, el sangrado empapa una compresa cada hora o te impide hacer tu vida normal.']],
+f:[['🏃','Ejercicio','Muchas personas toleran bien los entrenamientos más intensos: fuerza, cardio o aprender un deporte nuevo.'],
+['🥗','Alimentación','Comidas equilibradas con proteína, verduras, fibra y cereales integrales; alimentos fermentados si te sientan bien. Hidrátate.'],
+['😴','Descanso','Suele ser más fácil dormir bien. Aprovecha para fijar horarios regulares.'],
+['👥','Vida social','Buen momento para planes nuevos y quedar con gente.'],
+['🧠','Mente y trabajo','La concentración y la motivación suelen subir: útil para empezar proyectos, estudiar o aprender.']],
+o:[['🏃','Ejercicio','La energía suele estar alta: buen momento para series intensas, fuerza o deportes en grupo. Calienta bien antes de entrenar.'],
+['🥗','Alimentación','Frutas, verduras, fibra y proteína; mantén una buena hidratación.'],
+['😴','Descanso','Mantén tu rutina de sueño aunque te sientas con mucha energía.'],
+['👥','Vida social','Suele haber más ganas de socializar y comunicarse: conversaciones importantes, reuniones y presentaciones.'],
+['💗','Libido y fertilidad','La libido suele ser más alta. Es la fase de mayor fertilidad: esta app no es un método anticonceptivo.']],
+l:[['🏃','Ejercicio','Al empezar la fase, fuerza o cardio moderado; hacia el final, mejor yoga, pilates, caminatas o estiramientos si notas menos energía.'],
+['🥗','Alimentación','Comidas regulares con proteína y fibra para estabilizar el hambre; magnesio (frutos secos, legumbres, chocolate negro). Si notas pecho sensible o hinchazón, reduce cafeína, alcohol y sal. Tener más hambre es habitual.'],
+['😴','Descanso','El sueño puede empeorar: cuida la rutina de noche y evita cafeína y pantallas tarde.'],
+['👥','Vida social','Si estás cansada o irritable, reduce compromisos y pon límites; avisar a tu entorno ayuda.'],
+['🧠','Mente y trabajo','Deja las tareas de más concentración para cuando mejor te sientas y reserva tiempo para descansar.'],
+['⚠️','Consulta a un profesional si','el malestar emocional (tristeza intensa, ansiedad, irritabilidad) te afecta mucho cada mes.']]};
+function recCard(M){const ph=phaseNow(M,TODAY),rk=S.rph||(ph&&ph.k)||'m';
+ return`<div class=card><b>Recomendaciones generales por fase</b><div class=chips>${Object.entries(PH).map(([k,p])=>`<button class="chip${k==rk?' on':''}" style="${k==rk?CS(p.c):''}" data-rph=${k}>${p.e} ${p.n}</button>`).join('')}</div>${REC[rk].map(r=>`<div class=fld><b>${r[0]} ${r[1]}</b><p>${r[2]}</p></div>`).join('')}<p class=mut>Pautas generales, no basadas en tus datos ni médicas: no se cumplen igual en todas las personas. Tus propios patrones aparecen arriba y más abajo.</p></div>`}
 function vCal(){const M=model(),[y,m]=S.month.split('-').map(Number),f=new Date(y,m-1,1),off=(f.getDay()+6)%7,n=new Date(y,m,0).getDate(),ev={},ph={};
  M.C.forEach(c=>{if(c.ov)ev[add(c.s,c.ov-1)]='ov'});if(M.p){if(!M.last.ov&&M.p.ov)ev[M.p.ov]='ovp';M.p.list.forEach(x=>{for(let i=0;i<5;i++)ev[add(x.next,i)]='pp';if(x.ov)ev[x.ov]='ovp'})}
  M.C.forEach(c=>{const e=c.len||(M.p?diff(c.s,M.p.list[0].next):diff(c.s,TODAY)+1);for(let k=1;k<=e;k++)ph[add(c.s,k-1)]=phs(M,c.ov,k)});
@@ -103,7 +128,7 @@ function vChart(){const M=model(),C=M.C.slice(-12),k=S.metric,f=F.find(x=>x.k==k
   info=sel.map(i=>{const c=C[i];return`<p><span style="color:${col[i%12]}">●</span> <b>Ciclo del ${fmt(c.s,{day:'numeric',month:'long'})}</b>: ${c.len?c.len+' días':'en curso'}, ${c.ov?'ovulación estimada el día '+c.ov:'sin ovulación estimada'}, ${pts[i].length} días con dato.</p>`}).join('');
   const [pi,pn,pv]=(S.pt||'').split('|');if(S.pt&&has(+pi))info+=`<p>Ciclo del ${fmt(C[+pi].s,{day:'numeric',month:'short'})}, día ${pn}: <b>${f.o?f.o[+pv]:pv}</b></p>`;else if(sel.length)info+='<p class=mut>Toca un punto para ver el valor de ese día. Las líneas verticales punteadas marcan la ovulación estimada de cada ciclo elegido.</p>'}
  return`<h1>Ciclos superpuestos</h1><p class=mut>Tus ciclos alineados en el día 1 de la regla. Toca uno o varios para compararlos; «Todos» los muestra todos. Línea discontinua: media${sel.length>=2?' de los ciclos elegidos':' de tus ciclos'}.</p><div class=chips><button class="chip${sel.length?'':' on'}" data-sel=all>Todos</button>${C.map((c,i)=>`<button class="chip${has(i)?' on':''}" data-sel=${c.s} style="${has(i)?CS(col[i%12]):'border-color:'+col[i%12]}">${fmt(c.s,{day:'numeric',month:'short'})}</button>`).join('')}</div><div class=card style="color:var(--mut)">${svg}</div><div class=chips>${F.filter(x=>(x.k=='sleep'||x.s||x.k=='move')&&(x.req||on(x.k))).map(x=>`<button class="chip${x.k==k?' on':''}" data-m=${x.k}>${lab(x.k)}</button>`).join('')}</div>${info?`<div class=card>${info}</div>`:''}`}
-function vIns(){const M=model(),I=insights(M);let h='<h1>Patrones</h1>'+phaseCard(M,TODAY,true);
+function vIns(){const M=model(),I=insights(M);let h='<h1>Patrones</h1>'+phaseCard(M,TODAY,true)+recCard(M);
  if(M.p){const dd=diff(TODAY,M.p.list[0].next);h+=`<div class=card><b>Próximas 3 reglas</b>${M.p.list.map(x=>`<div class=row><span>${fmt(x.next,{weekday:'short',day:'numeric',month:'long'})}</span><span class=mut>±${x.r} días${x.ov?' · ovulación hacia el '+fmt(x.ov,{day:'numeric',month:'short'}):''}</span></div>`).join('')}<p class=mut>${dd>=0?`La primera, dentro de ${dd} días`:`La primera fecha pasó hace ${-dd} días`}. Margen del 80 %, que crece cuanto más lejos miras. Calculado con tus ${M.lens.length} ciclos completos (${mean(M.lens).toFixed(0)} ± ${sd(M.lens).toFixed(1)} días).</p></div>`}
  else h+=`<div class=card><b>Aprendiendo tu ritmo</b><p class=mut>${M.lens.length} de 2 ciclos completos registrados. Las predicciones empiezan cuando tus datos las respaldan.</p></div>`;
  return h+(I.length?I.slice(0,30).map(i=>{const [c,tg]=/suben y bajan|sentido contrario/.test(i.t)?['#35b59e','Relación']:/después de la ovulación/.test(i.t)?['#f2b134','Antes y después de ovular']:/en los <b>días/.test(i.t)?['#8e6bd8','Se repite']:['#e8607f','Resumen'];return`<div class=card style="border-left:5px solid ${c}"><span class=mut style="color:${c}">${tg}</span><div>${i.t}</div><p class=mut>${i.b}</p></div>`}).join('')+(I.length>30?`<p class=mut>Mostrando los 30 patrones más fuertes de ${I.length}.</p>`:''):'<p class=mut>Los patrones aparecen tras unos 3 ciclos con datos. Ajustes → Cargar datos de ejemplo te deja verlos ya.</p>')}
@@ -132,8 +157,8 @@ function sample(){let r=7;const R=()=>(r=r*16807%2147483647)/2147483647-.5,c=(v,
 document.addEventListener('click',async e=>{const t=e.target.closest('button,a,[data-p]');if(!t)return;const D=t.dataset;
  if(D.tab){S.tab=D.tab;return render()}if(D.day){e.preventDefault();S.date=D.day;S.tab='log';return render()}
  if(D.mo){const x=new Date(+S.month.slice(0,4),+S.month.slice(5)-1+ +D.mo,1);S.month=iso(x).slice(0,7);return render()}
- if(D.sel!==undefined){S.sel=D.sel=='all'?[]:S.sel.includes(D.sel)?S.sel.filter(x=>x!=D.sel):[...S.sel,D.sel];S.pt=null;return render()}if(D.p){S.pt=D.p;return render()}if(D.m){S.metric=D.m;S.pt=null;return render()}if(D.v!==undefined){await setv(D.k,+D.v);return render()}
- if(D.t!==undefined){const a=(S.logs[S.date]||{})[D.k]||[];await setv(D.k,a.includes(D.t)?a.filter(x=>x!=D.t):[...a,D.t]);return render()}
+ if(D.rph){S.rph=D.rph;return render()}if(D.sel!==undefined){S.sel=D.sel=='all'?[]:S.sel.includes(D.sel)?S.sel.filter(x=>x!=D.sel):[...S.sel,D.sel];S.pt=null;return render()}if(D.p){S.pt=D.p;return render()}if(D.m){S.metric=D.m;S.pt=null;return render()}if(D.v!==undefined){await setv(D.k,+D.v);return render()}
+ if(D.t!==undefined){const a=(S.logs[S.date]||{})[D.k]||[];await setv(D.k,a.includes(D.t)?a.filter(x=>x!=D.t):D.t=='nada'?['nada']:[...a.filter(x=>x!='nada'),D.t]);return render()}
  if(D.act=='import')return $('#imp').click();
  if(D.act=='export'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(Object.values(S.logs),null,1)],{type:'application/json'}));a.download='cycleiq-export.json';a.click()}
  if(D.act=='sample'&&(!Object.keys(S.logs).length||confirm('¿Reemplazar tus datos por datos de ejemplo?'))){await clr();S.logs={};for(const l of sample()){S.logs[l.date]=l;await put(l)}toast('Datos de ejemplo cargados');S.tab='ins';render()}
