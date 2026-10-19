@@ -37,7 +37,7 @@ const F=[
 const PH={m:{n:'Menstrual',e:'🌹',c:'#e8607f',g:'El estrógeno y la progesterona están bajos. Es habitual notar menos energía y más molestias. El ejercicio suave (caminar, yoga, estiramientos) suele sentar bien, y el descanso ayuda.'},
 f:{n:'Folicular',e:'🌱',c:'#5b8def',g:'El estrógeno va subiendo. A muchas personas les sube la energía, el ánimo y la concentración. Suele ser buen momento para entrenar más fuerte, aprender cosas nuevas y hacer planes sociales.'},
 o:{n:'Ovulatoria',e:'🌸',c:'#2f9e63',g:'Pico de estrógeno y de la hormona LH. La libido y las ganas de socializar suelen estar más altas, y la energía también. Es la fase de mayor fertilidad.'},
-l:{n:'Lútea',e:'🌙',c:'#f2a45a',g:'Sube la progesterona. Hacia el final es frecuente notar más hambre, antojos, pecho sensible, irritabilidad y menos energía o concentración. El ejercicio moderado, dormir bien y bajar el ritmo social suelen ayudar.'}};
+l:{n:'Lútea',e:'🌙',c:'#f2a45a',g:'Sube la progesterona. Hacia el final es frecuente notar más hambre, antojos, senos sensibles, irritabilidad y menos energía o concentración. El ejercicio moderado, dormir bien y bajar el ritmo social suelen ayudar.'}};
 const GC={core:'#e8607f',body:'#35b59e',mind:'#8e6bd8',soc:'#f2b134'},SC=['#5b8def','#35b59e','#f2b134','#f08a4b','#e8607f'];
 const lab=k=>F.find(f=>f.k==k).l.replace(/ \(.*/,'');
 let cfg=JSON.parse(localStorage.getItem('ciq')||'{"hide":[]}');const S={tab:'log',date:TODAY,logs:{},month:TODAY.slice(0,7),metric:'energy',sel:[],pt:null,rph:null,open:{core:1}};
@@ -103,7 +103,7 @@ o:[['🏃','Ejercicio','La energía suele estar alta: buen momento para series i
 ['👥','Vida social','Suele haber más ganas de socializar y comunicarse: conversaciones importantes, reuniones y presentaciones.'],
 ['💗','Libido y fertilidad','La libido suele ser más alta. Es la fase de mayor fertilidad: esta app no es un método anticonceptivo.']],
 l:[['🏃','Ejercicio','Al empezar la fase, fuerza o cardio moderado; hacia el final, mejor yoga, pilates, caminatas o estiramientos si notas menos energía.'],
-['🥗','Alimentación','Comidas regulares con proteína y fibra para estabilizar el hambre; magnesio (frutos secos, legumbres, chocolate negro). Si notas pecho sensible o hinchazón, reduce cafeína, alcohol y sal. Tener más hambre es habitual.'],
+['🥗','Alimentación','Comidas regulares con proteína y fibra para estabilizar el hambre; magnesio (frutos secos, legumbres, chocolate negro). Si notas senos sensibles o hinchazón, reduce cafeína, alcohol y sal. Tener más hambre es habitual.'],
 ['😴','Descanso','El sueño puede empeorar: cuida la rutina de noche y evita cafeína y pantallas tarde.'],
 ['👥','Vida social','Si estás cansada o irritable, reduce compromisos y pon límites; avisar a tu entorno ayuda.'],
 ['🧠','Mente y trabajo','Deja las tareas de más concentración para cuando mejor te sientas y reserva tiempo para descansar.'],
