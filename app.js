@@ -27,7 +27,7 @@ const F=[
 {k:'mucus',g:'core',l:'Flujo vaginal (moco)',o:['Seco','Pegajoso','Cremoso','Acuoso','Clara de huevo','Nada'],req:1},
 {k:'energy',g:'core',l:'Nivel de energía',s:1,w:'lo'},{k:'mood',g:'core',l:'Estado de ánimo',s:1,w:'lo'},
 {k:'pain',g:'body',l:'Dolor',s:1,z:1,w:'hi'},{k:'painType',g:'body',l:'Tipo de dolor',m:1,z:1,pre:'Tipo de dolor: ',o:['Cólicos','Cabeza','Lumbar','Pélvico','Articular','Migraña']},
-{k:'breast',g:'body',l:'Sensibilidad en el pecho',s:1,z:1,w:'hi'},{k:'sleep',g:'body',l:'Dormir (horas)',n:[0,14,.5]},{k:'sleepq',g:'body',l:'Calidad del sueño',s:1,w:'lo'},
+{k:'breast',g:'body',l:'Sensibilidad en los senos',s:1,z:1,w:'hi'},{k:'sleep',g:'body',l:'Dormir (horas)',n:[0,14,.5]},{k:'sleepq',g:'body',l:'Calidad del sueño',s:1,w:'lo'},
 {k:'dreams',g:'body',l:'Sueños',o:['No recuerdo','Normales','Vívidos','Pesadillas']},{k:'move',g:'body',l:'Actividad física',o:['Ninguna','Suave','Moderada','Intensa']},
 {k:'hunger',g:'body',l:'Hambre',s:1,w:'hi'},{k:'cravings',g:'body',l:'Antojos',m:1,z:1,pre:'Antojos de ',o:['Dulce','Salado','Chocolate','Carbohidratos','Grasa']},
 {k:'irritab',g:'mind',l:'Irritabilidad',s:1,z:1,w:'hi'},{k:'selfesteem',g:'mind',l:'Autoestima',s:1,w:'lo'},{k:'fulfil',g:'mind',l:'Realización personal',s:1,w:'lo'},
