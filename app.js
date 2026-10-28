@@ -28,7 +28,7 @@ const F=[
 {k:'energy',g:'core',l:'Nivel de energía',s:1,w:'lo'},{k:'mood',g:'core',l:'Estado de ánimo',s:1,w:'lo'},
 {k:'pain',g:'body',l:'Dolor',s:1,z:1,w:'hi'},{k:'painType',g:'body',l:'Tipo de dolor',m:1,z:1,pre:'Tipo de dolor: ',o:['Cólicos','Cabeza','Lumbar','Pélvico','Articular','Migraña']},
 {k:'breast',g:'body',l:'Sensibilidad en los senos',s:1,z:1,w:'hi'},{k:'sleep',g:'body',l:'Dormir (horas)',n:[0,14,.5]},{k:'sleepq',g:'body',l:'Calidad del sueño',s:1,w:'lo'},
-{k:'dreams',g:'body',l:'Sueños',o:['No recuerdo','Normales','Vívidos','Pesadillas']},{k:'move',g:'body',l:'Actividad física',o:['Ninguna','Suave','Moderada','Intensa']},
+{k:'dreams',g:'body',l:'Sueños',m:1,nn:'No recuerdo',pre:'Sueños: ',o:['Normales','Vívidos','Pesadillas']},{k:'move',g:'body',l:'Actividad física',o:['Ninguna','Suave','Moderada','Intensa'],info:'<p><strong>Nada / Ninguna</strong>: sin ejercicio ni movimiento intencionado ese día.</p><p><strong>Suave</strong>: paseo tranquilo, estiramientos, yoga suave. Puedes hablar o cantar sin esfuerzo.</p><p><strong>Moderada</strong>: caminar rápido, bici, natación, baile, pilates o fuerza ligera. Respiras más rápido, pero aún puedes hablar en frases cortas.</p><p><strong>Intensa</strong>: correr, HIIT, series o fuerza pesada, deporte competitivo. Te cuesta hablar y notas el esfuerzo.</p>'},
 {k:'hunger',g:'body',l:'Hambre',s:1,w:'hi'},{k:'cravings',g:'body',l:'Antojos',m:1,z:1,pre:'Antojos de ',o:['Dulce','Salado','Chocolate','Carbohidratos','Grasa']},
 {k:'irritab',g:'mind',l:'Irritabilidad',s:1,z:1,w:'hi'},{k:'selfesteem',g:'mind',l:'Autoestima',s:1,w:'lo'},{k:'fulfil',g:'mind',l:'Realización personal',s:1,w:'lo'},
 {k:'focus',g:'mind',l:'Concentración',s:1,w:'lo'},{k:'stress',g:'mind',l:'Estrés',s:1,w:'hi'},
@@ -65,13 +65,13 @@ function insights(M){const o=[],C=M.done,P=(t,b,sc,win)=>o.push({t,b,sc,win});
 const CS=c=>`background:${c};border-color:${c};color:#1d1a2b`;
 const ctl=(f,l)=>{const v=l[f.k];
  if(f.n)return`<input type=number inputmode=decimal data-n=${f.k} min=${f.n[0]} max=${f.n[1]} step=${f.n[2]} value="${v??''}" placeholder="—">`;
- if(f.m)return`<div class=chips>${[...f.o,'Nada'].map(t=>{const x=t.toLowerCase();return`<button class="chip${(v||[]).includes(x)?' on':''}" style="${(v||[]).includes(x)?CS(GC[f.g]):''}" data-k=${f.k} data-t="${x}">${t}</button>`}).join('')}</div>`;
+ if(f.m)return`<div class=chips>${[...f.o,f.nn||'Nada'].map(t=>{const x=t.toLowerCase();return`<button class="chip${[].concat(v||[]).includes(x)?' on':''}" style="${[].concat(v||[]).includes(x)?CS(GC[f.g]):''}" data-k=${f.k} data-t="${x}">${t}</button>`}).join('')}</div>`;
  return`<div class=chips>${(f.o||['0','1','2','3','4','5']).map((t,i)=>{const x=i;return`<button class="chip${v===x?' on':''}" style="${v===x?CS(GC[f.g]):''}" data-k=${f.k} data-v=${x}>${t}</button>`}).join('')}</div>`};
 function vLog(){const l=S.logs[S.date]||{},M=model(),ph=phaseNow(M,S.date),nx=M.p?diff(S.date,M.p.list[0].next):0;
  const sub=ph?`<i class=sw style="background:${ph.k?PH[ph.k].c:'var(--mut)'}"></i>${ph.k?'Fase '+PH[ph.k].n.toLowerCase():'Fase por determinar'}${nx>0?` · Est. ${nx} días hasta la próxima regla`:''}`:'Anota un día de regla para empezar tu primer ciclo';
  return`<h1>${S.date==TODAY?'Hoy':fmt(S.date)}${ph?` · Día ${ph.n}`:''}</h1><p class=sub>${sub}${S.date!=TODAY?' · <a href="#" data-day='+TODAY+'>volver a hoy</a>':''}</p>`+
  Object.entries(G).map(([g,t])=>{const fs=F.filter(f=>f.g==g&&(f.req||on(f.k)));if(!fs.length)return'';const n=fs.filter(f=>l[f.k]!=null).length;
-  return`<details class=card style="border-left:5px solid ${GC[g]}" data-g=${g} ${S.open[g]?'open':''}><summary><b style="color:color-mix(in srgb,${GC[g]} 70%,var(--ink))">${t}</b><span class=mut>${n}/${fs.length}</span></summary>${fs.map(f=>`<div class=fld><b>${f.l}</b>${ctl(f,l)}</div>`).join('')}</details>`}).join('')+
+  return`<details class=card style="border-left:5px solid ${GC[g]}" data-g=${g} ${S.open[g]?'open':''}><summary><b style="color:color-mix(in srgb,${GC[g]} 70%,var(--ink))">${t}</b><span class=mut>${n}/${fs.length}</span></summary>${fs.map(f=>`<div class=fld><b>${f.l}</b>${ctl(f,l)}${f.info?`<details class=info data-g=i_${f.k} ${S.open['i_'+f.k]?'open':''}><summary>ℹ️ ¿Qué significa cada opción? ▾</summary>${f.info}</details>`:''}</div>`).join('')}</details>`}).join('')+
  (on('note')?`<div class=card><b>Notas</b><textarea rows=3 data-note placeholder="Cualquier cosa que quieras recordar">${l.note||''}</textarea></div>`:'')}
 const phs=(M,ov,n)=>{const o=ov??M.od;if(n<=M.pl)return'm';if(o==null)return null;return n<o-1?'f':n<=o+1?'o':'l'};
 function phaseNow(M,date){const c=M.C.filter(c=>c.s<=date).pop();if(!c)return null;const n=diff(c.s,date)+1;if(c.len&&n>c.len)return null;return{n,k:phs(M,c.ov,n)}}
@@ -133,10 +133,11 @@ function vIns(){const M=model(),I=insights(M);let h='<h1>Patrones</h1>'+phaseCar
  else h+=`<div class=card><b>Aprendiendo tu ritmo</b><p class=mut>${M.lens.length} de 2 ciclos completos registrados. Las predicciones empiezan cuando tus datos las respaldan.</p></div>`;
  return h+(I.length?I.slice(0,30).map(i=>{const [c,tg]=/suben y bajan|sentido contrario/.test(i.t)?['#35b59e','Relación']:/después de la ovulación/.test(i.t)?['#f2b134','Antes y después de ovular']:/en los <b>días/.test(i.t)?['#8e6bd8','Se repite']:['#e8607f','Resumen'];return`<div class=card style="border-left:5px solid ${c}"><span class=mut style="color:${c}">${tg}</span><div>${i.t}</div><p class=mut>${i.b}</p></div>`}).join('')+(I.length>30?`<p class=mut>Mostrando los 30 patrones más fuertes de ${I.length}.</p>`:''):'<p class=mut>Los patrones aparecen tras unos 3 ciclos con datos. Ajustes → Cargar datos de ejemplo te deja verlos ya.</p>')}
 function vSet(){return`<h1>Ajustes</h1><div class=card><b>Qué quieres registrar</b><p class=mut>Flujo menstrual y moco están siempre activos. Desmarca lo que no quieras ver.</p>${[...F.filter(f=>!f.req),{k:'note',l:'Notas'}].map(f=>`<label class=row><span>${f.l}</span><input type=checkbox data-hide=${f.k} ${on(f.k)?'checked':''}></label>`).join('')}</div><div class=card><b>Tus datos</b><p class=mut>Se guardan solo en este navegador, en este dispositivo. No se envían a ningún sitio. No están cifrados: usa el bloqueo del móvil y exporta una copia de vez en cuando.</p><div class=chips><button class=chip data-act=export>Exportar JSON</button><button class=chip data-act=import>Importar JSON</button><input type=file id=imp data-imp accept=".json,application/json" hidden><button class=chip data-act=sample>Cargar datos de ejemplo</button><button class=chip data-act=clear>Borrar todo</button></div></div>`}
+const DRM=['no recuerdo','normales','vívidos','pesadillas'],mig=l=>{if(typeof l.dreams!='number')return false;const t=DRM[l.dreams];if(t)l.dreams=[t];else delete l.dreams;return true};
 const cleanLogs=d=>{if(!Array.isArray(d))return[];const ok=new Set([...F.map(f=>f.k),'note']),out=[];
  for(const r of d){if(!r||!/^\d{4}-\d{2}-\d{2}$/.test(r.date))continue;const x={date:r.date};
   for(const k in r){if(!ok.has(k))continue;const v=r[k];if(typeof v=='number'&&isFinite(v)||typeof v=='string'&&k=='note'||Array.isArray(v)&&v.every(s=>typeof s=='string'))x[k]=v}
-  if(Object.keys(x).length>1)out.push(x)}return out};
+  mig(x);if(Object.keys(x).length>1)out.push(x)}return out};
 async function imp(file){let out;try{out=cleanLogs(JSON.parse(await file.text()))}catch{return toast('Archivo no válido')}
  if(!out.length)return toast('No encontré días válidos');
  if(!confirm(`¿Importar ${out.length} días? Los días que ya tengas con la misma fecha se reemplazarán.`))return;
@@ -152,13 +153,13 @@ function sample(){let r=7;const R=()=>(r=r*16807%2147483647)/2147483647-.5,c=(v,
   const x={date:d,flow:n<=5?[3,3,2,1,1][n-1]:0,mucus:n<=5?0:n>=ov-2&&n<=ov?4:n<ov?2:1,sleep:+sl.toFixed(1),move:mv,
    energy:c(3.4+(n<=ov?.5:-.2)-(n>=L-5&&n<=L-3?2:0)+R()),mood,pain:c((n<=3?3.5:1.3)-(mv?.8:0)+R()),stress:c(2.5+R()*2),sleepq:c(3.6+(sl-7)*.6+R()),
    breast:c(1.3+(lut?1.2:0)+(lt?1:0)+R()),hunger:c(2.5+(lt?1.2:0)+R()),irritab:c(2+(lt?1.8:0)+R()),selfesteem:c(3.3+(lut?-.2:.3)+(sl-7)*.2-(lb?.7:0)+R()),fulfil:c(3.2+R()*1.2),
-   focus:c(3.6-(lt?.9:0)+R()),social:c(3.2+(n<=ov?.6:-.2)-(lt?.9:0)+R()),comm:c(3.4-(lt?.7:0)+R()),libido:lib,dreams:lut?(R()>0?2:1):1};
+   focus:c(3.6-(lt?.9:0)+R()),social:c(3.2+(n<=ov?.6:-.2)-(lt?.9:0)+R()),comm:c(3.4-(lt?.7:0)+R()),libido:lib,dreams:lut?(R()>.2?['vívidos','pesadillas']:['normales']):['normales']};
   if(lt&&R()>-.3)x.cravings=['dulce','chocolate'];if(n<=3)x.painType=R()>.3?['cólicos','lumbar']:['cólicos'];if(lib>=4&&R()>-.2)x.sex=R()>0?2:1;out.push(x)}});return out}
 document.addEventListener('click',async e=>{const t=e.target.closest('button,a,[data-p]');if(!t)return;const D=t.dataset;
  if(D.tab){S.tab=D.tab;return render()}if(D.day){e.preventDefault();S.date=D.day;S.tab='log';return render()}
  if(D.mo){const x=new Date(+S.month.slice(0,4),+S.month.slice(5)-1+ +D.mo,1);S.month=iso(x).slice(0,7);return render()}
  if(D.rph){S.rph=D.rph;return render()}if(D.sel!==undefined){S.sel=D.sel=='all'?[]:S.sel.includes(D.sel)?S.sel.filter(x=>x!=D.sel):[...S.sel,D.sel];S.pt=null;return render()}if(D.p){S.pt=D.p;return render()}if(D.m){S.metric=D.m;S.pt=null;return render()}if(D.v!==undefined){await setv(D.k,+D.v);return render()}
- if(D.t!==undefined){const a=(S.logs[S.date]||{})[D.k]||[];await setv(D.k,a.includes(D.t)?a.filter(x=>x!=D.t):D.t=='nada'?['nada']:[...a.filter(x=>x!='nada'),D.t]);return render()}
+ if(D.t!==undefined){const a=[].concat((S.logs[S.date]||{})[D.k]||[]),nv=(F.find(x=>x.k==D.k).nn||'Nada').toLowerCase();await setv(D.k,a.includes(D.t)?a.filter(x=>x!=D.t):D.t==nv?[nv]:[...a.filter(x=>x!=nv),D.t]);return render()}
  if(D.act=='import')return $('#imp').click();
  if(D.act=='export'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(Object.values(S.logs),null,1)],{type:'application/json'}));a.download='cycleiq-export.json';a.click()}
  if(D.act=='sample'&&(!Object.keys(S.logs).length||confirm('¿Reemplazar tus datos por datos de ejemplo?'))){await clr();S.logs={};for(const l of sample()){S.logs[l.date]=l;await put(l)}toast('Datos de ejemplo cargados');S.tab='ins';render()}
@@ -168,5 +169,5 @@ document.addEventListener('change',async e=>{const t=e.target,D=t.dataset;
  if(D.n!==undefined)await setv(D.n,t.value===''?undefined:+t.value);if(D.note!==undefined)await setv('note',t.value.trim()||undefined);
  if(D.hide){cfg.hide=t.checked?cfg.hide.filter(x=>x!=D.hide):[...cfg.hide,D.hide];localStorage.setItem('ciq',JSON.stringify(cfg))}});
 document.addEventListener('toggle',e=>{const g=e.target.dataset?.g;if(g)S.open[g]=e.target.open},true);
-dbAll().then(a=>{a.forEach(l=>S.logs[l.date]=l);render()});render();
+dbAll().then(a=>{a.forEach(l=>{if(mig(l))put(l);S.logs[l.date]=l});render()});render();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');navigator.storage?.persist?.();
