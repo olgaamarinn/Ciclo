@@ -30,7 +30,7 @@ const F=[
 {k:'breast',g:'body',l:'Sensibilidad en los senos',s:1,z:1,w:'hi'},{k:'sleep',g:'body',l:'Dormir (horas)',n:[0,14,.5]},{k:'sleepq',g:'body',l:'Calidad del sueño',s:1,w:'lo'},
 {k:'dreams',g:'body',l:'Sueños',m:1,nn:'No recuerdo',pre:'Sueños: ',o:['Normales','Vívidos','Pesadillas']},{k:'move',g:'body',l:'Actividad física',o:['Ninguna','Suave','Moderada','Intensa'],info:'<p><strong>Nada / Ninguna</strong>: sin ejercicio ni movimiento intencionado ese día.</p><p><strong>Suave</strong>: paseo tranquilo, estiramientos, yoga suave. Puedes hablar o cantar sin esfuerzo.</p><p><strong>Moderada</strong>: caminar rápido, bici, natación, baile, pilates o fuerza ligera. Respiras más rápido, pero aún puedes hablar en frases cortas.</p><p><strong>Intensa</strong>: correr, HIIT, series o fuerza pesada, deporte competitivo. Te cuesta hablar y notas el esfuerzo.</p>'},
 {k:'hunger',g:'body',l:'Hambre',s:1,w:'hi'},{k:'cravings',g:'body',l:'Antojos',m:1,z:1,pre:'Antojos de ',o:['Dulce','Salado','Chocolate','Carbohidratos','Grasa']},
-{k:'irritab',g:'mind',l:'Irritabilidad',s:1,z:1,w:'hi'},{k:'selfesteem',g:'mind',l:'Autoestima',s:1,w:'lo'},{k:'fulfil',g:'mind',l:'Realización personal',s:1,w:'lo'},
+{k:'irritab',g:'mind',l:'Irritabilidad',s:1,z:1,w:'hi'},{k:'cry',g:'mind',l:'Llorar',s:1,z:1,w:'hi'},{k:'selfesteem',g:'mind',l:'Autoestima',s:1,w:'lo'},{k:'fulfil',g:'mind',l:'Realización personal',s:1,w:'lo'},
 {k:'focus',g:'mind',l:'Concentración',s:1,w:'lo'},{k:'stress',g:'mind',l:'Estrés',s:1,w:'hi'},
 {k:'social',g:'soc',l:'Sociabilidad',s:1,w:'lo'},{k:'comm',g:'soc',l:'Comunicación',s:1,w:'lo'},{k:'libido',g:'soc',l:'Libido',s:1,w:'hi'},
 {k:'sex',g:'soc',l:'Actividad sexual',o:['Ninguna','Masturbación','Sexo']}];
@@ -56,7 +56,7 @@ function insights(M){const o=[],C=M.done,P=(t,b,sc,win)=>o.push({t,b,sc,win});
   if(rows.length>=3){const up=rows.filter(r=>r[1]>r[0]).length,dn=rows.filter(r=>r[1]<r[0]).length,d=mean(rows.map(r=>r[1]-r[0]));
    if(Math.abs(d)>=.4&&Math.max(up,dn)>=.75*rows.length)P(`${f.l}: <b>más ${d>0?'alto':'bajo'} después de la ovulación</b> (${d>0?'+':''}${d.toFixed(1)} en la escala 0–5).`,`Coincide en ${Math.max(up,dn)} de ${rows.length} ciclos.`,Math.abs(d)*3)}});
  const rows=M.C.flatMap(c=>Object.entries(c.d).map(([n,l])=>({...l,lut:!!c.ov&&+n>c.ov})));
- const cor=sub=>[['sleep','mood'],['sleep','energy'],['sleepq','mood'],['sleepq','energy'],['sleep','irritab'],['sleep','focus'],['pain','mood'],['move','pain'],['move','mood'],['move','energy'],['stress','sleep'],['stress','irritab'],['irritab','social'],['energy','mood'],['selfesteem','mood'],['social','mood'],['libido','mood'],['breast','pain']].map(([a,b])=>{const r=sub.filter(x=>x[a]!=null&&x[b]!=null);return r.length<15?null:{a,b,n:r.length,rho:spear(r.map(x=>x[a]),r.map(x=>x[b]))}}).filter(x=>x&&Math.abs(x.rho)>=.35);
+ const cor=sub=>[['sleep','mood'],['sleep','energy'],['sleepq','mood'],['sleepq','energy'],['sleep','irritab'],['sleep','focus'],['pain','mood'],['move','pain'],['move','mood'],['move','energy'],['stress','sleep'],['stress','irritab'],['cry','mood'],['stress','cry'],['irritab','social'],['energy','mood'],['selfesteem','mood'],['social','mood'],['libido','mood'],['breast','pain']].map(([a,b])=>{const r=sub.filter(x=>x[a]!=null&&x[b]!=null);return r.length<15?null:{a,b,n:r.length,rho:spear(r.map(x=>x[a]),r.map(x=>x[b]))}}).filter(x=>x&&Math.abs(x.rho)>=.35);
  const txt=(x,pre)=>P(`${pre}<b>${lab(x.a)} y ${lab(x.b).toLowerCase()}</b> ${x.rho>0?'suben y bajan juntos':'van en sentido contrario'}.`,`Spearman ρ = ${x.rho.toFixed(2)} en ${x.n} días. Es una asociación, no prueba que una cause la otra.`,Math.abs(x.rho)*8);
  const all=cor(rows);all.forEach(x=>txt(x,''));
  cor(rows.filter(r=>r.lut)).forEach(x=>{const a=all.find(y=>y.a==x.a&&y.b==x.b);if(!a||Math.abs(x.rho)>=Math.abs(a.rho)+.15)txt(x,'En tu fase lútea: ')});
@@ -152,7 +152,7 @@ function sample(){let r=7;const R=()=>(r=r*16807%2147483647)/2147483647-.5,c=(v,
  lens.forEach((L,ci)=>{const ov=L-14;for(let n=1;n<=L;n++,d=add(d,1)){const sl=7+R()*2.5,mv=R()>-.1?2:0,lut=ci<6&&n>ov,lt=ci<6&&n>=L-5,lb=ci<6&&n>=L-4,mood=c(3.3+(lut?-.3:.3)+(sl-7)*.5-(lb?.8:0)+R()),lib=c(2.4+(n>=ov-4&&n<=ov+1?1.8:0)+R());
   const x={date:d,flow:n<=5?[3,3,2,1,1][n-1]:0,mucus:n<=5?0:n>=ov-2&&n<=ov?4:n<ov?2:1,sleep:+sl.toFixed(1),move:mv,
    energy:c(3.4+(n<=ov?.5:-.2)-(n>=L-5&&n<=L-3?2:0)+R()),mood,pain:c((n<=3?3.5:1.3)-(mv?.8:0)+R()),stress:c(2.5+R()*2),sleepq:c(3.6+(sl-7)*.6+R()),
-   breast:c(1.3+(lut?1.2:0)+(lt?1:0)+R()),hunger:c(2.5+(lt?1.2:0)+R()),irritab:c(2+(lt?1.8:0)+R()),selfesteem:c(3.3+(lut?-.2:.3)+(sl-7)*.2-(lb?.7:0)+R()),fulfil:c(3.2+R()*1.2),
+   breast:c(1.3+(lut?1.2:0)+(lt?1:0)+R()),hunger:c(2.5+(lt?1.2:0)+R()),irritab:c(2+(lt?1.8:0)+R()),cry:c(.4+(lt?1.8:0)+R(),0,5),selfesteem:c(3.3+(lut?-.2:.3)+(sl-7)*.2-(lb?.7:0)+R()),fulfil:c(3.2+R()*1.2),
    focus:c(3.6-(lt?.9:0)+R()),social:c(3.2+(n<=ov?.6:-.2)-(lt?.9:0)+R()),comm:c(3.4-(lt?.7:0)+R()),libido:lib,dreams:lut?(R()>.2?['vívidos','pesadillas']:['normales']):['normales']};
   if(lt&&R()>-.3)x.cravings=['dulce','chocolate'];if(n<=3)x.painType=R()>.3?['cólicos','lumbar']:['cólicos'];if(lib>=4&&R()>-.2)x.sex=R()>0?2:1;out.push(x)}});return out}
 document.addEventListener('click',async e=>{const t=e.target.closest('button,a,[data-p]');if(!t)return;const D=t.dataset;
